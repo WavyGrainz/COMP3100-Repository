@@ -6,13 +6,13 @@ import java.util.List;
 public class Assignment1 {
         
         private static int serverId = 0;
-        private static int maxCores = 0;
-        private static String maxServerType = null;
-        private static String redyInfo = null;
-        private static String serverMsg = null;
-        private static List<String> servers = new ArrayList<String>();
-        private static List<String> maxCoreServers = new ArrayList<String>();
-        private static List<String> newMaxCoreServers = new ArrayList<String>();
+        private static int mostCores = 0;
+        private static String mostCoresServer = null;
+        private static String redyResponse = null;
+        private static String serverReply = null;
+        private static List<String> allServersList = new ArrayList<String>();
+        private static List<String> mostCoreList = new ArrayList<String>();
+        private static List<String> mostCoreListCopy = new ArrayList<String>();
         private static boolean onePass = true;
         private static boolean showServers = true;
 
@@ -33,13 +33,13 @@ public class Assignment1 {
                         System.out.println(readResponse(dataIn));
 
                         sendReply("REDY\n", dataOut);
-                        redyInfo = readResponse(dataIn);
-                        serverMsg = redyInfo.substring(0, 4);
-                        System.out.println("Readying system: " + redyInfo);
+                        redyResponse = readResponse(dataIn);
+                        serverReply = redyResponse.substring(0, 4);
+                        System.out.println("Readying system: " + redyResponse);
 
-                        while (!serverMsg.equals("NONE")) {
+                        while (!serverReply.equals("NONE")) {
 
-                                String getJobIdString[] = redyInfo.split(" ");
+                                String getJobIdString[] = redyResponse.split(" ");
                                 int jobId = Integer.parseInt(getJobIdString[2]);
                                 
                                 sendReply("GETS All\n", dataOut);
@@ -57,51 +57,51 @@ public class Assignment1 {
                                 sendReply("OK\n", dataOut);
 
                                 for (int i = 0; i < serverCount; i++) {
-                                        servers.add((String)dataIn.readLine());
+                                        allServersList.add((String)dataIn.readLine());
                                 }
 
                                 sendReply("OK\n", dataOut);
                                 readResponse(dataIn);
 
-                                for (int i = 0; i < servers.size(); i++) {
-                                        String getMax[] = servers.get(i).split(" ");
-                                        int coreCount = Integer.parseInt(getMax[4]);
-                                        if (coreCount > maxCores) {
-                                                maxCores = coreCount;
-                                                maxServerType = getMax[0];
-                                                System.out.println("Querying...'" + maxServerType
-                                                                + " " + serverId + "' has " + maxCores + " cores available.");
+                                for (int i = 0; i < allServersList.size(); i++) {
+                                        String mostCoresArray[] = allServersList.get(i).split(" ");
+                                        int coreCount = Integer.parseInt(mostCoresArray[4]);
+                                        if (coreCount > mostCores) {
+                                                mostCores = coreCount;
+                                                mostCoresServer = mostCoresArray[0];
+                                                System.out.println("Querying...'" + mostCoresServer
+                                                                + " " + serverId + "' has " + mostCores + " cores available.");
                                         }
                                 }
 
                                 while (onePass) {
                                         
-                                        for (int i = 0; i < servers.size(); i++) {
-                                                int serverCores = Integer.parseInt(servers.get(i).split(" ")[4]);
-                                                String serverType = servers.get(i).split(" ")[0];
+                                        for (int i = 0; i < allServersList.size(); i++) {
+                                                int serverCores = Integer.parseInt(allServersList.get(i).split(" ")[4]);
+                                                String serverType = allServersList.get(i).split(" ")[0];
 
-                                                if (serverCores == maxCores && serverType.equals(maxServerType)) {
-                                                        newMaxCoreServers.add(servers.get(i));
+                                                if (serverCores == mostCores && serverType.equals(mostCoresServer)) {
+                                                        mostCoreListCopy.add(allServersList.get(i));
                                                 }
                                         }
 
                                         onePass = false;
-                                        maxCoreServers = newMaxCoreServers;
+                                        mostCoreList = mostCoreListCopy;
                                 }
 
-                                if (serverMsg.equals("JOBN")) {
-                                        sendReply("SCHD " + jobId + " " + maxServerType + " " + serverId + "\n", dataOut);    
-                                        System.out.println("Scheduling Job " + jobId + " on " + maxServerType + " " + serverId + "..." + readResponse(dataIn) + ".");
+                                if (serverReply.equals("JOBN")) {
+                                        sendReply("SCHD " + jobId + " " + mostCoresServer + " " + serverId + "\n", dataOut);    
+                                        System.out.println("Scheduling Job " + jobId + " on " + mostCoresServer + " " + serverId + "..." + readResponse(dataIn) + ".");
                                         serverId++;
                                 }
 
-                                if (serverId >= maxCoreServers.size()) {
+                                if (serverId >= mostCoreList.size()) {
                                         serverId = 0;
                                 }
 
                                 sendReply("REDY\n", dataOut);
-                                redyInfo = readResponse(dataIn);
-                                serverMsg = redyInfo.substring(0, 4);
+                                redyResponse = readResponse(dataIn);
+                                serverReply = redyResponse.substring(0, 4);
                         }
 
                         System.out.println("All queued jobs scheduled. Exiting.");
