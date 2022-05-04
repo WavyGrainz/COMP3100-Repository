@@ -16,7 +16,7 @@ public class Week8Workshop {
 
             System.out.println("HELO reply = " + clientServerComm("HELO\n", dout, dis)); // client HELO
 
-            System.out.println("AUTH reply = " + clientServerComm("AUTH richighimi\n", dout, dis)); // client AUTH
+            System.out.println("AUTH reply = " + clientServerComm("AUTH justin\n", dout, dis)); // client AUTH
 
             String redyInfo = clientServerComm("REDY\n", dout, dis);
             System.out.println("REDY reply = " + redyInfo); // client REDY
